@@ -249,7 +249,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1082490149}
-  - component: {fileID: 1082490148}
+  - component: {fileID: 1082490150}
   m_Layer: 0
   m_Name: Miner
   m_TagString: Untagged
@@ -257,23 +257,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1082490148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1082490147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecdf6636ecf0f1b4d919cea6ddaab015, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  miner: {x: 16, y: 0, z: 16}
-  size: 32
-  floor: {fileID: 8050894723080107761, guid: 619200fc0a8329045a728aaa9764a167, type: 3}
-  seed: 18275
-  movesLeft: 100
 --- !u!4 &1082490149
 Transform:
   m_ObjectHideFlags: 0
@@ -289,6 +272,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1082490150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1082490147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f70fe76cb554e745841b81df27e17d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 100
+  seed: 1234
+  wall: {fileID: 5612169017560481391, guid: 121fb0e37629b1f47bf2e3af329bc13c, type: 3}
+  floor: {fileID: 8050894723080107761, guid: 619200fc0a8329045a728aaa9764a167, type: 3}
 --- !u!1 &1493568017
 GameObject:
   m_ObjectHideFlags: 0
