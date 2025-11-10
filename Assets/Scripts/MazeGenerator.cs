@@ -1,27 +1,51 @@
 using System.Collections.Generic;
-using System.Drawing;
+//using System.Drawing;
 using UnityEngine;
 
-public class mazegenerator : MonoBehaviour
+public class MazeGenerator : MonoBehaviour
 {
     System.Random m_rand;
     public int size = 10, seed = 0;
     public GameObject wall, floor;
+    Texture2D texture;
 
     private bool[,] maze;
+
+    [SerializeField] bool set2D = true;
+    [SerializeField] bool set3D = true;
+    
 
     private void Start()
     {
         
         m_rand = new System.Random(seed);
 
+        texture = new Texture2D(size, size);
+
         maze = new bool[size, size]; // creates a maze of false values
 
         GenerateMaze();
-        Draw();
+
+        if (set2D)
+        {
+            
+            GetComponent<MeshRenderer>().material.mainTexture = proGenTools.Draw2D(maze);
+        }
+        if (set3D)
+        {
+            Draw3D();
+            GetComponent<MeshRenderer>().material.mainTexture = texture;
+        }
+
     }
 
-    private void Draw()
+    public void imageOfMaze()
+    {
+        set3D = false;
+        Start();
+    }
+
+    private void Draw3D()
     {
         for (int x = 0; x < size; x++)
         {
@@ -38,7 +62,6 @@ public class mazegenerator : MonoBehaviour
             }
         }
     }
-
 
 
     private void GenerateMaze()

@@ -17,7 +17,7 @@ public class TextureLogicalAnd : MonoBehaviour
         public Color color;
     }
 
-    public TerrainHeights[] terrain;
+    public TerrainHeights[] Region;
 
 
     float currentHeight;
@@ -46,17 +46,25 @@ public class TextureLogicalAnd : MonoBehaviour
         random = new System.Random();
         texture = new Texture2D(ImageSize, ImageSize);
         pix = new Color[texture.width * texture.height];
+
+        colourmap = new Color[ImageSize, ImageSize];
+
         //createPattern();
-        //createNoiseMap();
-        generatePattern();
+        createNoiseMap();
+
+
+
+        //generatePattern();
+        
         
         GetComponent<MeshRenderer>().material.mainTexture = texture;
+        
     }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            generatePattern();
+            //generatePattern();
         }
     }
 
@@ -73,6 +81,7 @@ public class TextureLogicalAnd : MonoBehaviour
                 texture.SetPixel(x, y, pixleColour);
             }
         }
+       
         texture.Apply();
     }
 
@@ -93,12 +102,27 @@ public class TextureLogicalAnd : MonoBehaviour
                 
             }
         }
+
+        float[,] noisemap = PerlinNoiseGenerator.GenerateNoiseMap(ImageSize, ImageSize, octave, scale, lacunarity, persistance, random.Next(), offset);
+
+        for (int i = 0; i < noisemap.GetLength(0); i++)
+        {
+            for (int j = 0; j < noisemap.GetLength(1); j++)
+            {
+                texture.SetPixel(i, j, new Color(noisemap[i, j], noisemap[i, j], noisemap[i, j]));
+            }
+        }
+        texture.Apply();
+
         texture.SetPixels(pix);
         texture.Apply();
+
+        Colour(noisemap);
+        
     }
 
     //generating a multi layered perlin noise map
-    public void generatePattern()
+    /*public void generatePattern()
     {
         float[,] noisemap = PerlinNoiseGenerator.GenerateNoiseMap(ImageSize, ImageSize, octave, scale, lacunarity, persistance, random.Next(), offset);
 
@@ -111,8 +135,9 @@ public class TextureLogicalAnd : MonoBehaviour
         }
         texture.Apply();
 
-        Colour(noisemap);
-    }
+       Colour(noisemap);
+
+    }*/
 
     public void Colour(float[,] noisemap)
     {
@@ -124,11 +149,11 @@ public class TextureLogicalAnd : MonoBehaviour
             {
                 currentHeight = noisemap[i, j];
 
-                for(int k = 0; k < terrain.Length; k++)
+                for(int k = 0; k < Region.Length; k++)
                 {
-                    if(currentHeight <= terrain[k].height)
+                    if(currentHeight <= Region[k].height)
                     {
-                        colourmap[i,j] = terrain[k].color;
+                        colourmap[i,j] = Region[k].color;
                         break;
                     }
                 }
@@ -142,7 +167,10 @@ public class TextureLogicalAnd : MonoBehaviour
             }
         }
         texture.Apply();
+
         drawMode = DrawMode.colourmap;
+
+        
     }   
 
 
