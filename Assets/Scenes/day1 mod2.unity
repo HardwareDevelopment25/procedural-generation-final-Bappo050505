@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 985c480a637fe004cad5f820588b7629, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawMode: 1
+  drawMode: 0
   Region:
   - name: Snow
     height: 1
@@ -290,9 +290,9 @@ MonoBehaviour:
     height: 0.2
     color: {r: 0.6509434, g: 0.5309707, b: 0.04605731, a: 0}
   - name: Water
-    height: 0
+    height: 0.1
     color: {r: 0, g: 0.07986283, b: 1, a: 0}
-  ImageSize: 1020
+  ImageSize: 256
   seed: 120857
   scale: 10
   octave: 5
@@ -305,6 +305,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  newTexture: {fileID: 0}
 --- !u!64 &333235705
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -350,7 +351,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 67640f3c3e944db4c96443a4c50b2176, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
