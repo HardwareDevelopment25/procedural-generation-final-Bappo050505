@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class BSPDungeon : MonoBehaviour
@@ -27,6 +30,28 @@ public class BSPDungeon : MonoBehaviour
 
     private GameObject parent;
 
+    [System.Serializable]
+    public struct Edge
+    {
+
+        public Vector2Int SP, EP;
+        public List<Edge> edges;
+        public void SetSp(Vector2Int StartPoint)
+        {
+            SP = StartPoint;
+        }
+        public void SetEP(Vector2Int EndPoint)
+        {
+            EP = EndPoint;
+        }
+        public void Edge(Vector2Int SPoint, Vector2Int EPoint)
+        {
+            SP = SPoint;
+            EP = EPoint; 
+        }
+
+    }
+
     private int SmallestPossibleRoom = 2;
 
     public int border = 2;
@@ -41,6 +66,13 @@ public class BSPDungeon : MonoBehaviour
     private List<RectInt> _rooms = new List<RectInt>();
     private List<RectInt> _corridors = new List<RectInt>();
     private List<RectInt> _leafs = new List<RectInt>();
+    public List<Edge> edges = new List<Edge>();
+    public List<Edge> horizontal = new List<Edge>();
+    public List<Edge> vertical = new List<Edge>();
+    public List<Edge> mergedLines = new List<Edge>();
+
+
+
 
     private void Awake()
     {
@@ -49,7 +81,12 @@ public class BSPDungeon : MonoBehaviour
     private void Start()
     {
         Generate();
+        DetectEdge(_grid);
+        MergeLines(vertical, horizontal);
     }
+
+    #region floors
+
 
     // Generate():
     private void Generate()
@@ -300,7 +337,197 @@ public class BSPDungeon : MonoBehaviour
         // foreach (GameObject g in transform) GameObject.Destroy(g);
         GameObject.Destroy(parent);// killes em all
     }
+    #endregion
+
+    #region walls
+
+    
+    public void DetectEdge(bool[,] grid)
+    {
+         edges.Clear();
+
+        if (grid == null) return;
+        for (int x = 0; x < grid.GetLength(0); x++)
+        {
+            for (int y = 0; y < grid.GetLength(1); y++)
+            {
+                if (!grid[x, y])
+                {
+                    continue;
+                }
+                else if (grid[x, y])
+                {
+
+                    if (BoundsCheck(grid, x, y) || !grid[x, y - 1])//above
+                    {
+
+                        Edge top = new Edge();
+                        top.SetSp(new Vector2Int(x, y - 1));
+                        top.SetEP(new Vector2Int(x + 1, y - 1));
+                        edges.Add(top);
+                    }
+                    if (BoundsCheck(grid, x, y) || !grid[x, y + 1])//below
+                    {
+                        Edge bottom = new Edge();
+                        bottom.SetSp(new Vector2Int(x, y + 1));
+                        bottom.SetEP(new Vector2Int(x + 1, y + 1));
+                        edges.Add(bottom);
+                    }
+                    if (BoundsCheck(grid, x, y) || !grid[x - 1, y])//left
+                    {
+                        Edge left = new Edge();
+                        left.SetSp(new Vector2Int(x-1, y));
+                        left.SetEP(new Vector2Int(x - 1, y + 1));
+                        edges.Add(left);
+                    }
+                    if (BoundsCheck(grid, x, y) || !grid[x + 1, y])//right
+                    {
+                        Edge right = new Edge();
+                        right.SetSp(new Vector2Int(x+1, y));
+                        right.SetEP(new Vector2Int(x+1,y+1));
+                        edges.Add(right);
+                    }
+
+
+                }
+            }
+        }
+
+        SortLists(edges , horizontal , vertical);
+        
+
+        foreach (Edge line in mergedLines)
+        {
+            Debug.Log(line.SP + line.EP);
+        }
+
+    }
+
+    private bool BoundsCheck(bool[,] grid, int x , int y)
+    {
+
+        int width = grid.GetLength(0);
+        int height = grid.GetLength(1);
+
+        if (x > width || x < 0)
+        {
+            return true;
+            Debug.Log("out of bounds");
+        }
+        else if (y > height || y < 0)
+        {
+            return true;
+            Debug.Log("out of bounds");
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void SortLists(List<Edge> list, List<Edge> horizontal, List<Edge>vertical)
+    {
+        foreach (Edge e in list)
+        {
+            if(e.SP.x == e.EP.x)
+            {
+                vertical.Add(e);
+                vertical.Sort((a, b) =>
+                {
+                    int compareX = a.SP.x.CompareTo(b.SP.x);
+                    if (compareX != 0) return compareX;
+                    return a.SP.y.CompareTo(b.SP.y);
+                });
+
+            }
+            else if (e.SP.y == e.EP.y) 
+            {
+                horizontal.Add(e);
+                horizontal.Sort((a, b) =>
+                {
+                    int compareY = a.SP.y.CompareTo(b.SP.y);
+                    if (compareY != 0) return compareY;
+                    return a.SP.x.CompareTo(b.SP.x);
+                });
+            }
+        }
+    }
+
+    private List<Edge> MergeLines(List<Edge> vertical, List<Edge> horizontal)
+    {
+        Edge[] horiEdges = horizontal.ToArray();
+        Edge[] vertEdges = vertical.ToArray();
+
+        Edge currentLine;
+
+        List<Edge> merged = new List<Edge>();
+
+        int i = 0;
+        while (i < horizontal.Count)
+        {
+            int y = horizontal[i].SP.y;
+            int startX = horizontal[i].SP.x;
+            int endX = horizontal[i].EP.x;
+
+            int j = i + 1;
+            while (j < horizontal.Count &&
+                   horizontal[j].SP.y == y &&
+                   horizontal[j].SP.x == endX)
+            {
+                endX = horizontal[j].EP.x;
+                j++;
+            }
+
+            merged.Add(new Edge(new Vector2Int(startX, y), new Vector2Int(endX, y)));
+            i = j;
+
+            //horizontal lines
+            //checkes every horizontal line 
+
+            for (int i = 0; i < horiEdges.Length ; i++)
+            {
+            currentLine = horiEdges[i];
+            currentLine.SP = horiEdges[i].SP;
+            int j = i++;
+
+            while (j < horiEdges.Length && horiEdges[i].EP.y == horiEdges[j].SP.y)
+            {
+            currentLine.EP.x = horiEdges[j].EP.x;
+                j++;
+
+            }
+            mergedLines.Add(currentLine);
+           
+        }
+
+        //vertical lines
+        //checks every vertical line
+        
+        for (int i = 0; i < vertEdges.Length; i++)
+        {
+            currentLine = vertEdges[i];
+            currentLine.SP = vertEdges[i].SP;
+            int j = i ++;
+            
+            while (j < vertEdges.Length && vertEdges[i].EP.x == vertEdges[j].SP.x)
+            {
+                currentLine.EP.y = vertEdges[j].EP.y;
+                j++;
+
+            } 
+            mergedLines.Add(currentLine);
+
+        }
+
+        return mergedLines;
+
+
+
+    }
+    
+    #endregion
 }
+
 
 
 //Write a comment above the class explaining what a leaf is and why leaves are where rooms go.

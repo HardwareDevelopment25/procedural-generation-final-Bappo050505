@@ -19,6 +19,8 @@ public class RandomFillGrid : MonoBehaviour
     Texture2D texture;
     GameObject noiseMap;
 
+    public string me;
+
 
 
     void Start()
@@ -309,6 +311,4 @@ public class RandomFillGrid : MonoBehaviour
         }
     }
     */
-
-
 }
