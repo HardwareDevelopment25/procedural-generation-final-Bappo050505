@@ -44,12 +44,12 @@ public class BSPDungeon : MonoBehaviour
         {
             EP = EndPoint;
         }
-        public void Edge(Vector2Int SPoint, Vector2Int EPoint)
+        /*public void Edge(Vector2Int SPoint, Vector2Int EPoint)
         {
             SP = SPoint;
             EP = EPoint; 
         }
-
+        */
     }
 
     private int SmallestPossibleRoom = 2;
@@ -82,7 +82,7 @@ public class BSPDungeon : MonoBehaviour
     {
         Generate();
         DetectEdge(_grid);
-        MergeLines(vertical, horizontal);
+        //MergeLines(vertical, horizontal);
     }
 
     #region floors
@@ -453,7 +453,7 @@ public class BSPDungeon : MonoBehaviour
         }
     }
 
-    private List<Edge> MergeLines(List<Edge> vertical, List<Edge> horizontal)
+    /*private List<Edge> MergeLines(List<Edge> vertical, List<Edge> horizontal)
     {
         Edge[] horiEdges = horizontal.ToArray();
         Edge[] vertEdges = vertical.ToArray();
@@ -478,7 +478,7 @@ public class BSPDungeon : MonoBehaviour
                 j++;
             }
 
-            merged.Add(new Edge(new Vector2Int(startX, y), new Vector2Int(endX, y)));
+           // merged.Add(new Edge(new Vector2Int(startX, y), new Vector2Int(endX, y)));
             i = j;
 
             //horizontal lines
@@ -520,10 +520,12 @@ public class BSPDungeon : MonoBehaviour
         }
 
         return mergedLines;
+    
 
 
 
     }
+    */
     
     #endregion
 }

@@ -47,6 +47,9 @@ public static class PerlinNoiseGenerator
 
                 octaveOffset[i] = new Vector2 (offsetx, offsety);
             }
+
+            
+
             //creates the perlin map
             for (int y = 0; y < mapHeight; y++)
             {

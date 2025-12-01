@@ -338,10 +338,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 621e1dbcdf5f5224ea9b85757e4b5753, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  axion: F
+  axion: F--F--F
   iterations: 4
   laws:
-  - F->F+F-F-F+F+F-F
+  - F->F+F--F+F
   len: 0.4
   angle: 45.2
 --- !u!4 &1946621062

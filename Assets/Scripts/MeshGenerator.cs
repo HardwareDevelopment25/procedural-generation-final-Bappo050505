@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrain(float[,] heightMap, float hightMulti )
+    public static MeshData GenerateTerrain(float[,] heightMap, float hightMulti, int levelOfDetail)
     {
         int height = heightMap.GetLength( 0 );
         int width = heightMap.GetLength( 1 );
@@ -10,12 +10,18 @@ public static class MeshGenerator
         float topLeftX = (width - 1) / -2f;
         float topLeftZ = (height - 1) / 2f;
 
-        MeshData meshData = new MeshData(width, height);
+        int simplificationIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2;
+        
+        int vertPerLine= (width - 1) / simplificationIncrement + 1;
+
+
+        MeshData meshData = new MeshData(vertPerLine,height);
+
         int vertexIndex = 0;
 
-        for(int y = 0; y< height; y++)
+        for(int y = 0; y< height; y+= simplificationIncrement)
         {
-            for(int x = 0; x < width; x++)
+            for(int x = 0; x < width; x+= simplificationIncrement)
             {
                 meshData.vertcies[vertexIndex] = new Vector3((topLeftX + x), (heightMap[x, y] * hightMulti), (topLeftZ - y));
 
@@ -24,10 +30,10 @@ public static class MeshGenerator
 
                 //create triangle faces
 
-                if ((x < width - 1)&&(y < height - 1))//making square of 2 triangles
+                if ((x < width - simplificationIncrement)&&(y < height - simplificationIncrement))//making square of 2 triangles
                 {
-                    meshData.AddTriangle(vertexIndex, vertexIndex + width + 1 , vertexIndex + width);
-                    meshData.AddTriangle(vertexIndex + width + 1, vertexIndex, vertexIndex + 1);
+                    meshData.AddTriangle(vertexIndex, vertexIndex + vertPerLine + 1 , vertexIndex + vertPerLine);
+                    meshData.AddTriangle(vertexIndex + vertPerLine + 1, vertexIndex, vertexIndex + 1);
 
                     
                 }

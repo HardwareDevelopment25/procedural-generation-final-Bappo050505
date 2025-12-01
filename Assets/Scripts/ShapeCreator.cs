@@ -24,6 +24,8 @@ public class ShapeCreator : MonoBehaviour
     public float persistance = 1;
     public Vector2 offset;
     public AnimationCurve AC;
+    public int levelOfDetail;
+    public int heightMult;
     
 
     public Texture2D newTexture;
@@ -58,7 +60,7 @@ public class ShapeCreator : MonoBehaviour
             }
         }
 
-        MeshData MD = MeshGenerator.GenerateTerrain(CombinedMap, 5f);
+        MeshData MD = MeshGenerator.GenerateTerrain(CombinedMap, heightMult, levelOfDetail);
         MF.mesh = MD.CreateMesh();
 
         MR.material = material;
