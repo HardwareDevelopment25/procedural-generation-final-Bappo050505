@@ -12,6 +12,8 @@ public class ShapeCreator : MonoBehaviour
         public float height;
         public Color color;
     }
+
+    [SerializeField] private RandomDistrbution RD;
     
     //public int levelOfDetail = 1;
 
@@ -32,20 +34,22 @@ public class ShapeCreator : MonoBehaviour
     float currentHeight;
     public TerrainHeights[] Region;
 
-    
+    MeshFilter MF;
+    MeshRenderer MR;
+    Material material;
 
-   
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
 
-        newTexture = new Texture2D(sizeOfGrid, sizeOfGrid);
+        MF = this.AddComponent<MeshFilter>();
+        MR = this.AddComponent<MeshRenderer>();
 
-        MeshFilter MF = this.AddComponent<MeshFilter>();
-        MeshRenderer MR =  this.AddComponent<MeshRenderer>();
 
-        Material material = new Material(Shader.Find("Unlit/Texture"));
+
+        /*newTexture = new Texture2D(sizeOfGrid, sizeOfGrid);
 
         float[,] noisemap = PerlinNoiseGenerator.GenerateNoiseMap(sizeOfGrid, sizeOfGrid, octave, scale, lacunarity, persistance, seed, offset);
         float[,] FallOffMap = PerlinNoiseGenerator.GenerateFalloffMap(sizeOfGrid, AC);
@@ -67,12 +71,67 @@ public class ShapeCreator : MonoBehaviour
 
 
 
+
+
         //then texture
 
         ColourTheMap(CombinedMap,newTexture);
+        material.mainTexture = newTexture;*/
+
+        material = new Material(Shader.Find("Unlit/Texture"));
+
+        RD = GetComponent<RandomDistrbution>();
+
+        GenerateMap();
+
+    }
+    public void GenerateMap()
+    {
+
+        float[,] noisemap = null;
+        float[,] FallOffMap = null;
+        float[,] CombinedMap = null;
+
+
+
+
+        newTexture = new Texture2D(sizeOfGrid, sizeOfGrid);
+
+        noisemap = PerlinNoiseGenerator.GenerateNoiseMap(sizeOfGrid, sizeOfGrid, octave, scale, lacunarity, persistance, seed, offset);
+        FallOffMap = PerlinNoiseGenerator.GenerateFalloffMap(sizeOfGrid, AC);
+        CombinedMap = new float[sizeOfGrid, sizeOfGrid];
+
+
+        for (int i = 0; i < noisemap.GetLength(0); i++)
+        {
+            for (int j = 0; j < noisemap.GetLength(1); j++)
+            {
+                CombinedMap[i, j] = noisemap[i, j] - FallOffMap[i, j];
+            }
+        }
+
+        MeshData MD = MeshGenerator.GenerateTerrain(CombinedMap, heightMult, levelOfDetail);
+        MF.mesh = MD.CreateMesh();
+
+        MR.material = material;
+
+
+
+        //then texture
+
+        ColourTheMap(CombinedMap, newTexture);
         material.mainTexture = newTexture;
 
 
+
+
+
+        RD.GeneratePoints(sizeOfGrid , 50, 4, seed);
+
+
+
+
+        
     }
 
     public Texture2D ColourTheMap(float[,] noisemap, Texture2D texture)// pass in a noise map and returns the coloured texture.
@@ -106,6 +165,8 @@ public class ShapeCreator : MonoBehaviour
 
         return texture;
     }
+
+    
 
 
 
